@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import glob, os
 
 # settings
@@ -8,17 +8,14 @@ max_rows = 100
 class GrainsizeSet(object):
     name = ""
     data = []
-
-    # def __init__(self, name, data):
-    #     self.name = name
-    #     self.data = data
-
-
+    max_grainsizes = []
 
 # declare global variables
-grainsize_sets = []
+scenarios = []
 selected_files = []
 index = 0
+usecols = range(4, 13)
+
 
 # Look for dat files
 for root, dirs, files in os.walk("U:/Other_Stuff/Seminar_DMA/dem_reach/"):
@@ -30,15 +27,29 @@ for root, dirs, files in os.walk("U:/Other_Stuff/Seminar_DMA/dem_reach/"):
             index += 1
 
             filename = os.path.join(root, file)
-            print(filename)
+            print("Loading: " + filename)
 
-            data = numpy.genfromtxt(filename, delimiter=' ', max_rows=max_rows)
+            data = np.genfromtxt(filename, delimiter=' ', max_rows=max_rows, usecols=usecols)
             grainsize_set = GrainsizeSet()
+
+            print ("Processing: " + grainsize_set.name)
+
+            # load one column
+            column = np.array(data)
+            total_row = data[:,0]
+            calculated = column / total_row[:,None] * 100
+
+            # add to grainsize collection
             grainsize_set.name = os.path.basename(file)
-            grainsize_set.data = data
+            grainsize_set.absolute = data
+            grainsize_set.relative = calculated
+            scenarios.append(grainsize_set)
 
-            print("Loaded" + filename)
+    #print("finished")
 
-            grainsize_sets.append(grainsize_set)
+print("finished")
 
-    print("finished")
+# print("Find max for each column")
+#
+# for scenario in scenarios :
+#     scenario.
