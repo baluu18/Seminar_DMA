@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 # matplotlib 2.2.2
 
 # settings
-load_max_files = 6
-max_rows = 8760*50 # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
+load_max_files = 66
+max_rows = 8760*50  # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
 usecols = range(4, 14)
+skiprows = 10
 
 # declare custom objects
 class GrainsizeSet(object):
@@ -90,6 +91,12 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
 
             # load data
             data = np.genfromtxt(filename, delimiter=' ', max_rows=max_rows, usecols=usecols)
+
+            # filter data set
+            # data = data[0::skiprows]
+            # max_rows = max_rows / skiprows
+
+            # create new grainsize set
             grainsize_set = GrainsizeSet()
             grainsize_set.name = os.path.basename(file)
 
