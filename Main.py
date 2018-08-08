@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 # matplotlib 2.2.2
 
 # settings
-load_max_files = 66
-max_rows = 8760*10 # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
+load_max_files = 6
+max_rows = 8760*50 # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
 usecols = range(4, 14)
 
 # declare custom objects
@@ -100,29 +100,35 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             total_row = data[:,0]
             calculated = column / total_row[:,None] * 100
 
+            # declare figure for plot charts
+            fig, ax = plt.subplots()
+            fig.set_size_inches(20.5, 12.5)
+
             # chart specific settings
             title = 'Absolute grainsize distribution during scenario ' + grainsize_set.name[:-4]
 
             # create new plot with absolute data (not calculated data=relative data)
             x = np.arange(max_rows)
 
-            plt.ylabel('% of certain grainsize', fontsize=defaultFontSize)
+            plt.ylabel('absolute amount of certain grainsize', fontsize=defaultFontSize)
             plt.xlabel('years', fontsize=defaultFontSize)
             plt.title(title, fontsize=headerFontSize)
             plt.xticks(np.arange(0, max_rows, step=8760), np.arange(0, max_rows / 8760))
 
             # add data
-            # declare figure for plot charts
-            fig, ax = plt.subplots()
-            fig.set_size_inches(20.5, 12.5)
-            # add legend
-            ax.legend()
             for count in range(0, 8):
                 y = data[:, count]
                 ax.plot(x, y, color=labels[count-1].color, label=labels[count-1].name)
 
+            # add legend
+            ax.legend()
+
             # save as image
             plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "absolute-" + grainsize_set.name + ".png"))
+
+            # declare figure for plot charts
+            fig, ax = plt.subplots()
+            fig.set_size_inches(20.5, 12.5)
 
             # chart specific settings
             title = 'Relative grainsize distribution during scenario ' + grainsize_set.name[:-4]
@@ -136,14 +142,12 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             plt.xticks(np.arange(0, max_rows, step=8760), np.arange(0, max_rows/8760))
 
             # add data
-            # declare figure for plot charts
-            fig, ax = plt.subplots()
-            fig.set_size_inches(20.5, 12.5)
+            for count in range(0, 8):
+                y = calculated[:, count]
+                ax.plot(x, y, color=labels[count-1].color, label=labels[count-1].name)
+
             # add legend
             ax.legend()
-            for count in range(0, 8):
-                y = data[:, count]
-                ax.plot(x, y, color=labels[count-1].color, label=labels[count-1].name)
 
             # save as image
             plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "relative-" + grainsize_set.name + ".png"))
