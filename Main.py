@@ -9,20 +9,71 @@ import matplotlib.pyplot as plt
 # matplotlib 2.2.2
 
 # settings
-load_max_files = 3
-max_rows = 100
+load_max_files = 66
+max_rows = 8760*10 # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
+usecols = range(4, 14)
 
+# declare custom objects
 class GrainsizeSet(object):
     name = ""
     data = []
-    max_grainsizes = []
+
+grainsizes = []
+class Grainsize(object):
+    name = ""
+    scenario = ""
+    max_grainsize = 0
+
+labels = []
+class Label(object):
+    name = ""
+    color = ""
 
 # declare global variables
-scenarios = []
 selected_files = []
 index = 0
-usecols = range(4, 14)
 
+# chart style
+defaultFontSize = 14
+headerFontSize = 18
+
+# define labels and colors for each column
+label = Label()
+label.name = "0.0001m"
+label.color = "fuchsia"
+labels.append(label)
+label = Label()
+label.name = "0.005m"
+label.color = "purple"
+labels.append(label)
+label = Label()
+label.name = "0.02m"
+label.color = "blue"
+labels.append(label)
+label = Label()
+label.name = "0.04m"
+label.color = "cyan"
+labels.append(label)
+label = Label()
+label.name = "0.08m"
+label.color = "green"
+labels.append(label)
+label = Label()
+label.name = "0.12m"
+label.color = "gold"
+labels.append(label)
+label = Label()
+label.name = "0.2m"
+label.color = "orange"
+labels.append(label)
+label = Label()
+label.name = "0.4m"
+label.color = "red"
+labels.append(label)
+label = Label()
+label.name = "1.5m"
+label.color = "black"
+labels.append(label)
 
 # Look for dat files
 for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
@@ -49,105 +100,64 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             total_row = data[:,0]
             calculated = column / total_row[:,None] * 100
 
+            # chart specific settings
+            title = 'Absolute grainsize distribution during scenario ' + grainsize_set.name[:-4]
+
             # create new plot with absolute data (not calculated data=relative data)
+            x = np.arange(max_rows)
+
+            plt.ylabel('% of certain grainsize', fontsize=defaultFontSize)
+            plt.xlabel('years', fontsize=defaultFontSize)
+            plt.title(title, fontsize=headerFontSize)
+            plt.xticks(np.arange(0, max_rows, step=8760), np.arange(0, max_rows / 8760))
+
+            # add data
+            # declare figure for plot charts
             fig, ax = plt.subplots()
             fig.set_size_inches(20.5, 12.5)
-            x = np.arange(max_rows)
-            plt.ylabel('% of certain grainsize', fontsize=14)
-            plt.xlabel('years', fontsize=14)
-            plt.title(grainsize_set.name, fontsize=18)
-            plt.suptitle('Absolute grainsize distribution during scenario', fontsize=18)  # if Possible loop over scenarios name
-
-            # dashes format: 2pt line, 2pt break, 10pt line, 2pt break
-            y = data[:,1]
-            ax.plot(x, y, color='fuchsia', label='0.0001m')
-
-            y = data[:, 2]
-            ax.plot(x, y, color='purple', label='0.005m')
-
-            y = data[:, 3]
-            ax.plot(x, y, color='blue', label='0.02m')
-
-            y = data[:, 4]
-            ax.plot(x, y, color='cyan', label='0.04m')
-
-            y = data[:, 5]
-            ax.plot(x, y, color='green', label='0.08m')
-
-            y = data[:, 6]
-            ax.plot(x, y, dashes=[2, 2, 10, 2], color='gold', label='0.12m')
-
-            y = data[:, 7]
-            ax.plot(x, y, color='orange', label='0.2m')
-
-            y = data[:, 8]
-            ax.plot(x, y, dashes=[2, 2, 10, 2], color='red', label='0.4m')
-
-            y = data[:, 9]
-            ax.plot(x, y, dashes=[2, 2, 10, 2], color='black', label='1.5m')
-
             # add legend
             ax.legend()
+            for count in range(0, 8):
+                y = data[:, count]
+                ax.plot(x, y, color=labels[count-1].color, label=labels[count-1].name)
 
             # save as image
             plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "absolute-" + grainsize_set.name + ".png"))
 
-
+            # chart specific settings
+            title = 'Relative grainsize distribution during scenario ' + grainsize_set.name[:-4]
 
             # create new plot with relative data (calculated data)
+            x = np.arange(max_rows)
+
+            plt.ylabel('% of certain grainsize', fontsize=defaultFontSize)
+            plt.xlabel('years', fontsize=defaultFontSize)
+            plt.title(title, fontsize=headerFontSize)
+            plt.xticks(np.arange(0, max_rows, step=8760), np.arange(0, max_rows/8760))
+
+            # add data
+            # declare figure for plot charts
             fig, ax = plt.subplots()
             fig.set_size_inches(20.5, 12.5)
-            x = np.arange(max_rows)
-            plt.ylabel('% of certain grainsize', fontsize= 14)
-            plt.xlabel('years', fontsize=14)
-            plt.suptitle('Relative grainsize distribution during scenario', fontsize=18)
-            plt.title(grainsize_set.name, fontsize=18)
-
-            # dashes format: 2pt line, 2pt break, 10pt line, 2pt break
-            y = calculated[:, 1]
-            ax.plot(x, y, color='fuchsia', label='0.0001m')
-
-            y = calculated[:, 2]
-            ax.plot(x, y, color='purple', label='0.005m')
-
-            y = calculated[:, 3]
-            ax.plot(x, y, color='blue', label='0.02m')
-
-            y = calculated[:, 4]
-            ax.plot(x, y, color='cyan', label='0.04m')
-
-            y = calculated[:, 5]
-            ax.plot(x, y, color='green', label='0.08m')
-
-            y = calculated[:, 6]
-            ax.plot(x, y, dashes=[2, 2, 10, 2], color='gold', label='0.12m')
-
-            y = calculated[:, 7]
-            ax.plot(x, y, color='orange', label='0.2m')
-
-            y = calculated[:, 8]
-            ax.plot(x, y, dashes=[2, 2, 10, 2], color='red', label='0.4m')
-
-            y = calculated[:, 9]
-            ax.plot(x, y, dashes=[2, 2, 10, 2], color='black', label='1.5m')
-
             # add legend
             ax.legend()
+            for count in range(0, 8):
+                y = data[:, count]
+                ax.plot(x, y, color=labels[count-1].color, label=labels[count-1].name)
 
             # save as image
             plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "relative-" + grainsize_set.name + ".png"))
 
-            # add to grainsize collection
+            # clear figure
+            plt.close('all')
 
-            grainsize_set.absolute = data
-            grainsize_set.relative = calculated
-            scenarios.append(grainsize_set)
+            # get max value for each grainsize column
+            for count in range(0, 8):
+                grainsize = Grainsize()
+                grainsize.name = labels[count-1].name
+                grainsize.scenario = grainsize_set.name
+                grainsize.max_grainsize = np.max(data[:, count])
+                grainsizes.append(grainsize)
 
-    #print("finished")
 
 print("finished")
-
-# print("Find max for each column")
-#
-# for scenario in scenarios :
-#     scenario.
