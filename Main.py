@@ -9,19 +9,23 @@ import matplotlib.pyplot as plt
 # matplotlib 2.2.2
 
 # settings
-load_max_files = 1
-max_rows = 8760*20  # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
+load_max_files = 6
+year = 8760
+max_rows = year*50  # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
 load_cols = range(4, 14)
 skiprows = 10
 use_cols = range(0, 4)
 max_rows = max_rows / skiprows
 
 # declare custom objects
+
+# creating a template to store the grainsize data sets. The template has a parameter for name of the set and its data.
 class GrainsizeSet(object):
     name = ""
     data = []
 
-grainsizes = []
+
+# create template to store information about grainsize name, scenario and the max value
 class Grainsize(object):
     name = ""
     scenario = ""
@@ -35,6 +39,8 @@ class Label(object):
 # declare global variables
 selected_files = []
 index = 0
+# declare a list to store all gainsize related max values
+grainsizes = []
 
 # chart style
 defaultFontSize = 14
@@ -85,6 +91,7 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
     for file in files:
         if file.endswith(".dat") and (index < load_max_files):
 
+            # increment index in order to compare with load max files setttings
             index += 1
 
             # get filename
@@ -105,8 +112,9 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
 
             # load one column
             column = np.array(data)
-            total_row = data[:,0]
-            calculated = column / total_row[:,None] * 100
+            first_row_data = data[:,0]
+            # calculate percentage for all grainsize columns compared to the total column
+            calculated = column / first_row_data[:,None] * 100
 
             # declare figure for plot charts
             fig, ax = plt.subplots()
@@ -121,7 +129,7 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             plt.ylabel('absolute amount of certain grainsize', fontsize=defaultFontSize)
             plt.xlabel('years', fontsize=defaultFontSize)
             plt.title(title, fontsize=headerFontSize)
-            plt.xticks(np.arange(0, max_rows, step=8760/skiprows), np.arange(0, max_rows / (8760/skiprows)))
+            plt.xticks(np.arange(0, max_rows, step=year/skiprows), np.arange(0, max_rows / (year/skiprows)))
 
             # add data
             for count in use_cols:
@@ -148,7 +156,7 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             plt.ylabel('% of certain grainsize', fontsize=defaultFontSize)
             plt.xlabel('years', fontsize=defaultFontSize)
             plt.title(title, fontsize=headerFontSize)
-            plt.xticks(np.arange(0, max_rows, step=8760 / skiprows), np.arange(0, max_rows / (8760 / skiprows)))
+            plt.xticks(np.arange(0, max_rows, step=year / skiprows), np.arange(0, max_rows / (year / skiprows)))
 
             # add data
             for count in use_cols:
@@ -162,7 +170,24 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             # save as image
             plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "relative-" + grainsize_set.name + ".png"))
 
-            # clear figure
+            # create box plot for calculated sizes
+
+            # menMeans = calculated[:, 1]
+            # womenMeans = calculated[:, 2]
+            #
+            # p1 = plt.bar(max_rows, menMeans)
+            # p2 = plt.bar(max_rows, womenMeans, bottom=menMeans)
+            #
+            # plt.ylabel('Scores')
+            # plt.title('Scores by group and gender')
+            # plt.xticks(np.arange(0, max_rows, step=year / skiprows), np.arange(0, max_rows / (year / skiprows)))
+            # y = calculated[:, count + 1]
+            # #plt.yticks(np.arange(0, 81, 10))
+            # ax.legend()
+            #
+            # plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "relative-boxplot-" + grainsize_set.name + ".png"))
+
+            # clear figure (clear memory)
             plt.close('all')
 
             # get max value for each grainsize column
