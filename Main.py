@@ -9,10 +9,12 @@ import matplotlib.pyplot as plt
 # matplotlib 2.2.2
 
 # settings
-load_max_files = 66
-max_rows = 8760*50  # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
-usecols = range(4, 14)
+load_max_files = 1
+max_rows = 8760*20  # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
+load_cols = range(4, 14)
 skiprows = 10
+use_cols = range(0, 4)
+max_rows = max_rows / skiprows
 
 # declare custom objects
 class GrainsizeSet(object):
@@ -90,11 +92,10 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             print("Loading: " + filename)
 
             # load data
-            data = np.genfromtxt(filename, delimiter=' ', max_rows=max_rows, usecols=usecols)
+            data = np.genfromtxt(filename, delimiter=' ', max_rows=max_rows*skiprows, usecols=load_cols)
 
             # filter data set
-            # data = data[0::skiprows]
-            # max_rows = max_rows / skiprows
+            data = data[0::skiprows]
 
             # create new grainsize set
             grainsize_set = GrainsizeSet()
@@ -120,12 +121,13 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             plt.ylabel('absolute amount of certain grainsize', fontsize=defaultFontSize)
             plt.xlabel('years', fontsize=defaultFontSize)
             plt.title(title, fontsize=headerFontSize)
-            plt.xticks(np.arange(0, max_rows, step=8760), np.arange(0, max_rows / 8760))
+            plt.xticks(np.arange(0, max_rows, step=8760/skiprows), np.arange(0, max_rows / (8760/skiprows)))
 
             # add data
-            for count in range(0, 8):
-                y = data[:, count]
-                ax.plot(x, y, color=labels[count-1].color, label=labels[count-1].name)
+            for count in use_cols:
+                # skip the first column with total values
+                y = data[:, count+1]
+                ax.plot(x, y, color=labels[count].color, label=labels[count].name)
 
             # add legend
             ax.legend()
@@ -146,12 +148,13 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             plt.ylabel('% of certain grainsize', fontsize=defaultFontSize)
             plt.xlabel('years', fontsize=defaultFontSize)
             plt.title(title, fontsize=headerFontSize)
-            plt.xticks(np.arange(0, max_rows, step=8760), np.arange(0, max_rows/8760))
+            plt.xticks(np.arange(0, max_rows, step=8760 / skiprows), np.arange(0, max_rows / (8760 / skiprows)))
 
             # add data
-            for count in range(0, 8):
-                y = calculated[:, count]
-                ax.plot(x, y, color=labels[count-1].color, label=labels[count-1].name)
+            for count in use_cols:
+                # skip the first column with total values
+                y = calculated[:, count+1]
+                ax.plot(x, y, color=labels[count].color, label=labels[count].name)
 
             # add legend
             ax.legend()
@@ -163,7 +166,7 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
             plt.close('all')
 
             # get max value for each grainsize column
-            for count in range(0, 8):
+            for count in use_cols:
                 grainsize = Grainsize()
                 grainsize.name = labels[count-1].name
                 grainsize.scenario = grainsize_set.name
