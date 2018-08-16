@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 # matplotlib 2.2.2
 
 # settings
-load_max_files = 66
+load_max_files = 2
 year = 8760
 max_rows = year*100  # 8760 -> 1y; 17520 -> 2y;  35040 -> 4y
 load_cols = range(4, 14)
-skiprows = 2
-use_cols = range(0, 9)
+skiprows = 5 # not possible to load all rows otherwise computer crashes
+use_cols = range(8, 9)
 max_rows = max_rows / skiprows
 
 # declare custom objects
@@ -39,15 +39,14 @@ class Label(object):
 # declare global variables
 selected_files = []
 index = 0
-# declare a list to store all gainsize related max values
+# declare a list to store all gainsize related max  values
 grainsizes = []
 
 # chart style
-defaultFontSize = 16
+defaultFontSize = 18
 headerFontSize = 20
-numberFontSize = 11
-legendFontSize = 12
-
+labelFontSize = 11
+legendFontSize= 12
 
 # define labels and colors for each column
 label = Label()
@@ -121,20 +120,21 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
 
             # declare figure for plot charts
             fig, ax = plt.subplots()
-            fig.set_size_inches(30.5, 15.5)
+            fig.set_size_inches(35.5, 16.5)
+
 
             # chart specific settings
-            title = 'Absolute grain-size distribution during scenario ' + grainsize_set.name[:-4]
+            title = 'Absolute grainsize distribution during scenario ' + grainsize_set.name[:-4]
 
             # create new plot with absolute data (not calculated data=relative data)
             x = np.arange(max_rows)
 
-            plt.ylabel('Absolute amount of certain grain-size', fontsize=defaultFontSize)
-            plt.yticks(fontsize=numberFontSize)
+            plt.ylabel('Absolute amount of certain grainsize', fontsize=defaultFontSize)
             plt.xlabel('years', fontsize=defaultFontSize)
             plt.title(title, fontsize=headerFontSize)
-            plt.xticks(np.arange(0, max_rows, step=year/skiprows), np.arange(0, max_rows / (year/skiprows)), fontsize= numberFontSize, rotation ='vertical')
-            #plt.xticks(fontsize = labelFontsize, position = 'vertical')
+            plt.yticks(fontsize=10)
+            plt.xticks(np.arange(0, max_rows, step=(year/skiprows)), np.arange(0, max_rows / (year/skiprows), fontsize= 12, rotation ='vertical')
+
             # add data
             for count in use_cols:
                 # skip the first column with total values
@@ -142,26 +142,26 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
                 ax.plot(x, y, color=labels[count].color, label=labels[count].name)
 
             # add legend
-            ax.legend(loc=1, fontsize = legendFontSize, title= "Grain-size fractions")
+            ax.legend(loc=1, fontsize= 14)
 
             # save as image
             plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "absolute-" + grainsize_set.name + ".png"))
 
             # declare figure for plot charts
             fig, ax = plt.subplots()
-            fig.set_size_inches(30.5, 15.5)
+            fig.set_size_inches(35.5, 16.5)
 
             # chart specific settings
-            title = 'Relative grain-size distribution during scenario ' + grainsize_set.name[:-4]
+            title = 'Relative grainsize distribution during scenario ' + grainsize_set.name[:-4]
 
             # create new plot with relative data (calculated data)
             x = np.arange(max_rows)
 
-            plt.ylabel('% of certain grain-size', fontsize=defaultFontSize)
-            plt.yticks(np.arange(0, 101, 10), fontsize = numberFontSize)
+            plt.ylabel('% of certain grainsize', fontsize=defaultFontSize)
             plt.xlabel('years', fontsize=defaultFontSize)
             plt.title(title, fontsize=headerFontSize)
-            plt.xticks(np.arange(0, max_rows, step=year / skiprows), np.arange(0, max_rows / (year / skiprows)), fontsize= numberFontSize, rotation ='vertical')
+            plt.yticks(np.arange(0, 100, step=10), fontsize= 10)
+            plt.xticks(np.arange(0, max_rows, step =(year/skiprows)), np.arange(0, max_rows / (year / skiprows), fontsize= 12, rotation ='vertical')
 
 
             # add data
@@ -171,21 +171,38 @@ for root, dirs, files in os.walk("C:\LocalDrive\Seminar_DMA2\input"):
                 ax.plot(x, y, color=labels[count].color, label=labels[count].name)
 
             # add legend
-            ax.legend(loc=1, fontsize= legendFontSize, title= "Grain-size fractions")
+            ax.legend(loc=1, fontsize= legendFontSize)
 
             # save as image
             plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "relative-" + grainsize_set.name + ".png"))
 
+            # create box plot for calculated sizes
 
+            # menMeans = calculated[:, 1]
+            # womenMeans = calculated[:, 2]
+            #
+            # p1 = plt.bar(max_rows, menMeans)
+            # p2 = plt.bar(max_rows, womenMeans, bottom=menMeans)
+            #
+            # plt.ylabel('Scores')
+            # plt.title('Scores by group and gender')
+            # plt.xticks(np.arange(0, max_rows, step=year / skiprows), np.arange(0, max_rows / (year / skiprows)))
+            # y = calculated[:, count + 1]
+            # #plt.yticks(np.arange(0, 81, 10))
+            # ax.legend()
+            #
+            # plt.savefig(os.path.join("C:\LocalDrive\Seminar_DMA2\output", "relative-boxplot-" + grainsize_set.name + ".png"))
+
+            # clear figure (clear memory)
             plt.close('all')
 
             # get max value for each grainsize column
-            for count in use_cols:
-                grainsize = Grainsize()
-                grainsize.name = labels[count-1].name
-                grainsize.scenario = grainsize_set.name
-                grainsize.max_grainsize = np.max(data[:, count])
-                grainsizes.append(grainsize)
+            #for count in use_cols:
+                #grainsize = Grainsize()
+                #grainsize.name = labels[count-1].name
+                #grainsize.scenario = grainsize_set.name
+                #grainsize.max_grainsize = np.max(data[:, count])
+                #grainsizes.append(grainsize)
 
 
 print("finished")
